@@ -82,7 +82,9 @@ class LSTMLinearRegression(torch.nn.Module):
         Returns:
             torch.Tensor: output tensor
         """
-        lstm_output = self.blocks['lstm'](x)[:, -1, :]  # The last LSTM pred
-        head_output = self.blocks['head'](lstm_output)
+        lstm_output = self.blocks['lstm'](x)
+        output = lstm_output[:, -1, :]
+        for layer in self.blocks['head']:
+            output = layer(output)
 
-        return head_output
+        return output

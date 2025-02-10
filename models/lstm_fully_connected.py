@@ -14,17 +14,20 @@ class LSTMFullyConnected(BaseLSTMModel):
             self,
             input_size: int,
             hidden_size: int,
-            activation_func: torch.nn.Module,
             hidden_layer_size: int,
+            activation_func: torch.nn.Module,
             device: torch.device
             ):
         """ Model's initialization
 
         Args:
             input_size (int): number of consecutive points used to make a \
-                  prediction
+                prediction
             hidden_size (int): size of hidden state in a LSTM cell
-            device (torch.device): CPU or GPU torch.device
+            hidden_layer_size (int): size of a hidden fully connected layer
+            activation_func (torch.nn.Module): hidden layers' activation \
+                function
+            device (torch.device):CPU or GPU torch.device
         """
         super().__init__(
             input_size=input_size,
@@ -32,8 +35,8 @@ class LSTMFullyConnected(BaseLSTMModel):
             device=device
             )
 
-        self.activation_func = activation_func
         self.hidden_layer_size = hidden_layer_size
+        self.activation_func = activation_func
 
         self._init_blocks()
 

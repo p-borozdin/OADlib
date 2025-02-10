@@ -30,6 +30,8 @@ class LSTMLinearRegression(BaseLSTMModel):
             device=device
             )
 
+        self._init_blocks()
+
     def _init_head_block(self) -> torch.nn.Module:
         """ Initialize the model's head block.\n
         Overriding the method from the base class.

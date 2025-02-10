@@ -30,21 +30,31 @@ class BaseLSTMModel(torch.nn.Module):
         self.device = device
 
         self.blocks = torch.nn.ParameterDict()
-        self.__init_blocks()
 
-    def __init_blocks(self):
-        """ Initialization of the model's blocks (LSTM and head blocks)
+    def _init_blocks(self):
+        """ Initialization of the model's blocks (LSTM and head blocks).\n
+        Must be called in constructor
+        after all the member fields are initialized
         """
         blocks = {}
 
-        blocks['lstm'] = LSTMBlock(
+        blocks['lstm'] = self._init_lstm_block()
+        blocks['head'] = self._init_head_block()
+
+        self.blocks = torch.nn.ParameterDict(blocks)
+
+    def _init_lstm_block(self) -> torch.nn.Module:
+        """ Initialize the model's LSTM block.\n
+        Optionally can be overriden in derived classes.
+
+        Returns:
+            torch.nn.Module: LSTM block for the model
+        """
+        return LSTMBlock(
             input_size=self.input_size,
             hidden_size=self.hidden_size,
             device=self.device
             )
-        blocks['head'] = self._init_head_block()
-
-        self.blocks = torch.nn.ParameterDict(blocks)
 
     def _init_head_block(self) -> torch.nn.Module:
         """ Initialize the model's head block.\n

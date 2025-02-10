@@ -31,9 +31,9 @@ class LSTMLinearRegression(torch.nn.Module):
         self.device = device
 
         self.blocks = torch.nn.ParameterDict()
-        self.init_blocks()
+        self._init_blocks()
 
-    def init_blocks(self):
+    def _init_blocks(self):
         """ Initialization of the model's blocks (LSTM and head blocks)
         """
         blocks = {}

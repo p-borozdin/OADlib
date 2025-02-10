@@ -66,10 +66,10 @@ class LSTMBlock(torch.nn.Module):
         Returns:
             bool: True if check is passed successfully
         """
-        assert x.dim() == 3, f"input shape expected to be \
-            (batch size, seq len, input size), but got shape = {x.shape}"
+        assert x.dim() == 3, f"input shape expected to be " \
+            f"(batch size, seq len, input size), but got shape = {x.shape}"
 
-        assert x.size(2) == self.input_size, f"input size expected to be \
-            {self.input_size}, but got {x.size(2)}"
+        assert x.size(2) == self.input_size, f"input size expected to be " \
+            f"{self.input_size}, but got {x.size(2)}"
 
         return True

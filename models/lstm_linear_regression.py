@@ -3,7 +3,7 @@ with the Linear Regression block after the LSTM block
 """
 import torch
 
-from lstm_block import LSTMBlock
+from OADlib.models.lstm_block import LSTMBlock
 
 
 class LSTMLinearRegression(torch.nn.Module):

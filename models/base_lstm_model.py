@@ -67,21 +67,3 @@ class BaseLSTMModel(torch.nn.Module):
             torch.nn.Module: head block for the model
         """
         raise NotImplementedError()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """ Default forward pass for LSTM-based model,
-        when only the last LSTM cell's results are taken.\n
-        Optionally can be overriden in derived classes.
-
-        Args:
-            x (torch.Tensor): input tensor
-
-        Returns:
-            torch.Tensor: output tensor
-        """
-        lstm_output = self.blocks['lstm'](x)
-        output = lstm_output[:, -1, :]
-        for layer in self.blocks['head']:
-            output = layer(output)
-
-        return output

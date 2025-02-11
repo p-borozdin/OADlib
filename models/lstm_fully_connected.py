@@ -76,3 +76,19 @@ class LSTMFullyConnected(BaseLSTMModel):
         )
 
         return torch.nn.ParameterList(head_layers)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """ Forward pass for the model
+
+        Args:
+            x (torch.Tensor): input tensor
+
+        Returns:
+            torch.Tensor: output tensor
+        """
+        lstm_output = self.blocks['lstm'](x)
+        output = lstm_output[:, -1, :]
+        for layer in self.blocks['head']:
+            output = layer(output)
+
+        return output

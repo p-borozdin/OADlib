@@ -47,7 +47,7 @@ class LSTMSelfAttention(BaseLSTMModel):
         self.hidden_layer_size = hidden_layer_size
         self.activation_func = activation_func
 
-        self._init_head_block()
+        self._init_blocks()
 
     def _init_head_block(self) -> torch.nn.Module:
         """ Initialize the model's head block.\n
@@ -62,7 +62,7 @@ class LSTMSelfAttention(BaseLSTMModel):
         head_parts['fc'] = self.__init_fc_part()  # Fully-connected part
 
         return torch.nn.ParameterDict(head_parts)
-    
+
     def __init_sa_part(self) -> torch.nn.Module:
         """ Initialize the model head's Self-Attention part
 
@@ -74,7 +74,7 @@ class LSTMSelfAttention(BaseLSTMModel):
             model_dim=self.model_sa_dim,
             device=self.device
             )
-    
+
     def __init_fc_part(self) -> torch.nn.Module:
         """ Initialize the model head's fully-connected part
 
@@ -110,6 +110,8 @@ class LSTMSelfAttention(BaseLSTMModel):
         Returns:
             torch.Tensor: output tensor
         """
+        self.__check_dim(x)
+
         lstm_output = self.blocks['lstm'](x)
         sa_output = self.blocks['head']['sa'](lstm_output)
         output = sa_output.view(sa_output.size(0), -1)
@@ -118,3 +120,18 @@ class LSTMSelfAttention(BaseLSTMModel):
             output = layer(output)
 
         return output
+
+    def __check_dim(self, x: torch.Tensor) -> bool:
+        """ Check dimension and shape for a tensor passed to \
+            the Self-Attention model
+
+        Args:
+            x (torch.Tensor): input tensor
+
+        Returns:
+            bool: True if check is passed successfully
+        """
+        assert x.size(1) == self.seq_len, f"expected seq len to be " \
+            f"{self.seq_len}, but got {x.size(1)}"
+
+        return True

@@ -21,8 +21,7 @@ class LSTMFullyConnected(BaseLSTMModel):
         """ Model's initialization
 
         Args:
-            input_size (int): number of consecutive points used to make a \
-                prediction
+            input_size (int): number of input features
             hidden_size (int): size of hidden state in a LSTM cell
             hidden_layer_size (int): size of a hidden fully connected layer
             activation_func (torch.nn.Module): hidden layers' activation \
@@ -67,13 +66,12 @@ class LSTMFullyConnected(BaseLSTMModel):
                 self.activation_func
             )
         )
-        head_layers.append((
+        head_layers.append(
             torch.nn.Linear(
                 in_features=self.hidden_layer_size,
                 out_features=1
                 )
             )
-        )
 
         return torch.nn.ParameterList(head_layers)
 

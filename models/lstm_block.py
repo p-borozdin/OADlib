@@ -17,8 +17,7 @@ class LSTMBlock(torch.nn.Module):
         """ LSTM block initialization
 
         Args:
-            input_size (int): number of consecutive points used to make a \
-                  prediction
+            input_size (int): number of input features
             hidden_size (int): size of hidden state in a LSTM cell
             device (torch.device): CPU or GPU torch.device
         """

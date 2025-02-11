@@ -43,7 +43,7 @@ class LSTMBlock(torch.nn.Module):
         Returns:
             torch.Tensor: output tensor
         """
-        self._check_dim(x)
+        self.__check_dim(x)
         batch_size = x.size(0)
 
         h0 = Variable(
@@ -56,7 +56,7 @@ class LSTMBlock(torch.nn.Module):
         out, _ = self.lstm(x, (h0, c0))
         return out
 
-    def _check_dim(self, x: torch.Tensor) -> bool:
+    def __check_dim(self, x: torch.Tensor) -> bool:
         """ Check dimension and shape for a tensor passed to the LSTM block
 
         Args:

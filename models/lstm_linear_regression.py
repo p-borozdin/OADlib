@@ -3,12 +3,13 @@ with the Linear Regression block after the LSTM block
 """
 import torch
 
-from OADlib.models.base_lstm_model import BaseLSTMModel
+from OADlib.models.src.lstm_block import LSTMBlock
+from OADlib.models.src.linear_regression_head import LinearRegressionHead
 
 
-class LSTMLinearRegression(BaseLSTMModel):
+class LSTMLinearRegression(torch.nn.Module):
     """ LSTM-based model with Linear Regression block as its head.\n
-    The class inherits from BaseLSTMModel
+    The class inherits from torch.nn.Module
     """
     def __init__(
             self,
@@ -23,32 +24,31 @@ class LSTMLinearRegression(BaseLSTMModel):
             hidden_size (int): size of hidden state in a LSTM cell
             device (torch.device): CPU or GPU torch.device
         """
-        super().__init__(
-            input_size=input_size,
-            hidden_size=hidden_size,
-            device=device
-            )
+        super(LSTMLinearRegression, self).__init__()
 
-        self._init_blocks()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.device = device
 
-    def _init_head_block(self) -> torch.nn.Module:
-        """ Initialize the model's head block.\n
-        Overriding the method from the base class.
+        self.blocks = torch.nn.ParameterDict()
+        self.__init_blocks()
 
-        Returns:
-            torch.nn.Module: Linear Regression head block for the model
+    def __init_blocks(self):
+        """ Initialize the model's blocks
+        (LSTM and Linear Regression head blocks)
         """
-        head_layers: list[torch.nn.Module] = []
+        blocks = {}
 
-        head_layers.append(torch.nn.ReLU())
-        head_layers.append(
-            torch.nn.Linear(
-                in_features=self.hidden_size,
-                out_features=1
-                )
-            )
+        blocks['lstm'] = LSTMBlock(
+            input_size=self.input_size,
+            hidden_size=self.hidden_size,
+            device=self.device
+        )
+        blocks['head'] = LinearRegressionHead(
+            in_features=self.hidden_size
+        )
 
-        return torch.nn.ParameterList(head_layers)
+        self.blocks = torch.nn.ParameterDict(blocks)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """ Forward pass for the model
@@ -60,8 +60,6 @@ class LSTMLinearRegression(BaseLSTMModel):
             torch.Tensor: output tensor
         """
         lstm_output = self.blocks['lstm'](x)
-        output = lstm_output[:, -1, :]
-        for layer in self.blocks['head']:
-            output = layer(output)
+        head_output = self.blocks['head'](lstm_output)
 
-        return output
+        return head_output

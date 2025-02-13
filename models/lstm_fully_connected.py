@@ -3,12 +3,13 @@ with the Fully Connected block after the LSTM block
 """
 import torch
 
-from OADlib.models.base_lstm_model import BaseLSTMModel
+from OADlib.models.src.lstm_block import LSTMBlock
+from OADlib.models.src.fully_connected_head import FullyConnectedHead
 
 
-class LSTMFullyConnected(BaseLSTMModel):
+class LSTMFullyConnected(torch.nn.Module):
     """ LSTM-based model with Fully Connected block as its head.\n
-    The class inherits from BaseLSTMModel
+    The class inherits from torch.nn.Module
     """
     def __init__(
             self,
@@ -28,52 +29,35 @@ class LSTMFullyConnected(BaseLSTMModel):
                 function
             device (torch.device):CPU or GPU torch.device
         """
-        super().__init__(
-            input_size=input_size,
-            hidden_size=hidden_size,
-            device=device
-            )
+        super(LSTMFullyConnected, self).__init__()
 
+        self.input_size = input_size
+        self.hidden_size = hidden_size
         self.hidden_layer_size = hidden_layer_size
         self.activation_func = activation_func
+        self.device = device
 
-        self._init_blocks()
+        self.blocks = torch.nn.ParameterDict()
+        self.__init_blocks()
 
-    def _init_head_block(self) -> torch.nn.Module:
-        """ Initialize the model's head block.\n
-        Overriding the method from the base class.
-
-        Returns:
-            torch.nn.Module: Fully Connected head block for the model
+    def __init_blocks(self):
+        """ Initialize the model's blocks
+        (LSTM and Fully-Connected head blocks)
         """
-        head_layers: list[torch.nn.Module] = []
+        blocks = {}
 
-        head_layers.append(
-            torch.nn.Sequential(
-                torch.nn.Linear(
-                    in_features=self.hidden_size,
-                    out_features=self.hidden_layer_size
-                ),
-                self.activation_func
-            )
+        blocks['lstm'] = LSTMBlock(
+            input_size=self.input_size,
+            hidden_size=self.hidden_size,
+            device=self.device
         )
-        head_layers.append(
-            torch.nn.Sequential(
-                torch.nn.Linear(
-                    in_features=self.hidden_layer_size,
-                    out_features=self.hidden_layer_size
-                ),
-                self.activation_func
-            )
+        blocks['head'] = FullyConnectedHead(
+            in_features=self.hidden_size,
+            hidden_layer_size=self.hidden_layer_size,
+            activation_func=self.activation_func
         )
-        head_layers.append(
-            torch.nn.Linear(
-                in_features=self.hidden_layer_size,
-                out_features=1
-                )
-            )
 
-        return torch.nn.ParameterList(head_layers)
+        self.blocks = torch.nn.ParameterDict(blocks)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """ Forward pass for the model
@@ -85,8 +69,6 @@ class LSTMFullyConnected(BaseLSTMModel):
             torch.Tensor: output tensor
         """
         lstm_output = self.blocks['lstm'](x)
-        output = lstm_output[:, -1, :]
-        for layer in self.blocks['head']:
-            output = layer(output)
+        head_output = self.blocks['head'](lstm_output)
 
-        return output
+        return head_output

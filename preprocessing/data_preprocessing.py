@@ -1,8 +1,8 @@
 """ The module provides the implementation of the data preprocessing class
 """
 import os
-import numpy as np
 import pandas as pd
+import numpy as np
 from OADlib.preprocessing.smoothing.base_smoother import BaseSmoother
 from OADlib.preprocessing.derivative_computation.\
     base_derivative_computer import BaseDerivativeComputer
@@ -31,6 +31,7 @@ class Preprocessing:
             col_name: str,
             save_to: str,
             ext: str = "csv",
+            load_from: str | None = None,
             sep: str = ","
             ):
         """ Performs data smoothing for each file
@@ -41,8 +42,13 @@ class Preprocessing:
             col_name (str): column that needs to be smoothed
                 save_to (str): directory to save `pandas.Dataframes`
                 with smoothed files\n
-            ext (str): extension of saved files. Default is `"csv"`
-            sep (str): column separator. Default is `","`
+            ext (str, optional): extension of saved files. Default is `"csv"`
+            load_from (str | None, optional): if `load_from` is `None`,
+                the files from directory with raw data will be used.
+                If `load_data` is specified, it denotes a directory
+                to take files from for smoothing. Default is `None`
+            sep (str, optional): column separator in input data.
+                Default is `","`
 
         The method goes through each file in a raw data directory
         and performs smoothing of a specific column denoted as `col_name`.
@@ -59,8 +65,15 @@ class Preprocessing:
         assert os.path.exists(save_to), \
             f"Unable to smooth data: directory \"{save_to}\" doesn't exist"
 
-        for filename in sorted(os.listdir(self.data_dir)):
-            df = pd.read_csv(f"{self.data_dir}/{filename}", sep=sep)
+        if load_from is not None:
+            assert os.path.exists(load_from), \
+                f"Unable to smooth data: " \
+                f"directory \"{load_from}\" doesn't exist"
+
+        src_dir = self.data_dir if load_from is None else load_from
+
+        for filename in sorted(os.listdir(src_dir)):
+            df = pd.read_csv(f"{src_dir}/{filename}", sep=sep)
             smoothed_data = smoother.execute(df[col_name])
 
             df.rename(
@@ -94,12 +107,13 @@ class Preprocessing:
                 to store computed derivative
             save_to (str): directory to save `pandas.DataFrames`
                 with computed derivatives
-            ext (str): extension of saved files. Default is `"csv"`
-            load_from (str | None): if `load_from` is `None`,
+            ext (str, optional): extension of saved files. Default is `"csv"`
+            load_from (str | None, optional): if `load_from` is `None`,
                 the files from directory with raw data will be used.
                 If `load_data` is specified, it denotes a directory
-                to take files from to compute derivatives
-            sep (str): column separator. Default is `","`
+                to take files from to compute derivatives. Default is `None`
+            sep (str, optional): column separator in input data.
+                Default is `","`
 
         The method goes through each file in a source directory
         (raw data directory or specified `load_from` directory)
@@ -134,3 +148,73 @@ class Preprocessing:
 
             fn, _ = os.path.splitext(filename)
             df.to_csv(f"{save_to}/{fn}.{ext}", index=False)
+
+    def group_by(
+            self,
+            seq_len: int,
+            *,
+            group_columns: str | tuple[str],
+            target_columns: str | tuple[str],
+            save_to: str,
+            load_from: str | None = None,
+            sep: str = ","
+            ):
+        """ Groupes values from `group_columns` by `seq_len` samples
+        and mathes them to a corresponding single value from each
+        column in `target_columns` and stores the data in an `numpy.npz`
+        archive
+
+        Args:
+            seq_len (int): the number of consecutive samples to group by
+            group_columns (str | tuple[str]): denotes a column/columns
+                values from which are grouped by `seq_len` samples
+            target_columns (str | tuple[str]): denotes a column/columns
+                to values from which the previous gropued values are matched
+            save_to (str): directory to save `numpy.npz` archive
+                with grouped values
+            load_from (str | None, optional): if `load_from` is `None`,
+                the files from directory with raw data will be used.
+                If `load_data` is specified, it denotes a directory
+                to take files from to group values. Default is `None`
+            sep (str, optional): column separator in input data.
+                Default is `","`
+
+        Imagine you have a dataframe with columns named `a`, `b`, `c` and `d`;
+        and you want to group values from columns `a`, `b` so that slices
+        `a[i - n:i]`, `b[i - n:i]` must match values `c[i - 1]` and `d[i - 1]`.
+        To do so you can call `group_by()` method with `seq_len` = `n`,
+        `group_columns` = `('a', 'b')`, `target_columns` = `('c', 'd')`.
+        The desired matching will be stored in the `save_to` directory in
+        `numpy.npz` format
+        """
+        assert os.path.exists(save_to), \
+            f"Unable to group data: " \
+            f"directory \"{save_to}\" doesn't exist"
+
+        if load_from is not None:
+            assert os.path.exists(load_from), \
+                f"Unable to group data: " \
+                f"directory \"{load_from}\" doesn't exist"
+
+        src_dir = self.data_dir if load_from is None else load_from
+
+        groups_list = ((group_columns,)
+                       if isinstance(group_columns, str) else group_columns)
+        targets_list = ((target_columns,)
+                        if isinstance(target_columns, str) else target_columns)
+
+        for filename in sorted(os.listdir(src_dir)):
+            df = pd.read_csv(f"{src_dir}/{filename}", sep=sep)
+
+            target_data = {
+                name: np.array(df[name][seq_len - 1:])
+                for name in targets_list}
+
+            data_len = len(df) - (seq_len - 1)
+            grouped_data = {
+                name: np.array([df[name][i:i + seq_len]
+                                for i in range(data_len)])
+                for name in groups_list}
+
+            fn, _ = os.path.splitext(filename)
+            np.savez(f"{save_to}/{fn}.npz", **(target_data | grouped_data))

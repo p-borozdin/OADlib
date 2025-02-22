@@ -31,6 +31,7 @@ class Preprocessing:
             col_name: str,
             save_to: str,
             ext: str = "csv",
+            use_files: tuple[str] | None = None,
             load_from: str | None = None,
             sep: str = ","
             ):
@@ -43,14 +44,19 @@ class Preprocessing:
                 save_to (str): directory to save `pandas.Dataframes`
                 with smoothed files\n
             ext (str, optional): extension of saved files. Default is `"csv"`
+            use_files (tuple[str] | None, optional): specify files to use
+                for smoothing. If `None`, all files from source directory
+                will be used. Default is `None`
             load_from (str | None, optional): if `load_from` is `None`,
                 the files from directory with raw data will be used.
                 If `load_data` is specified, it denotes a directory
-                to take files from for smoothing. Default is `None`
+                with source files for smoothing. Default is `None`
             sep (str, optional): column separator in input data.
                 Default is `","`
 
-        The method goes through each file in a raw data directory
+        The method goes through each file in the source directory
+        (if `use_files` is `None`), or through each file in `use_files`
+        (if the latter is specified)
         and performs smoothing of a specific column denoted as `col_name`.
         The smoothed `*.<ext>` files are saved to a `save_to` directory.
         In the created files the smoothed series is denoted as `col_name`,
@@ -71,8 +77,9 @@ class Preprocessing:
                 f"directory \"{load_from}\" doesn't exist"
 
         src_dir = self.data_dir if load_from is None else load_from
+        filenames = os.listdir(src_dir) if use_files is None else use_files
 
-        for filename in sorted(os.listdir(src_dir)):
+        for filename in sorted(filenames):
             df = pd.read_csv(f"{src_dir}/{filename}", sep=sep)
             smoothed_data = smoother.execute(df[col_name])
 
@@ -92,6 +99,7 @@ class Preprocessing:
             deriv_col_name: str,
             save_to: str,
             ext: str = "csv",
+            use_files: tuple[str] | None = None,
             load_from: str | None = None,
             sep: str = ","
             ):
@@ -108,15 +116,19 @@ class Preprocessing:
             save_to (str): directory to save `pandas.DataFrames`
                 with computed derivatives
             ext (str, optional): extension of saved files. Default is `"csv"`
+            use_files (tuple[str] | None, optional): specify files to use
+                for computing derivatives. If `None`, all files from source
+                directory will be used. Default is `None`
             load_from (str | None, optional): if `load_from` is `None`,
                 the files from directory with raw data will be used.
                 If `load_data` is specified, it denotes a directory
                 to take files from to compute derivatives. Default is `None`
             sep (str, optional): column separator in input data.
                 Default is `","`
-
-        The method goes through each file in a source directory
-        (raw data directory or specified `load_from` directory)
+        
+        The method goes through each file in the source directory
+        (if `use_files` is `None`), or through each file in `use_files`
+        (if the latter is specified)
         and computes the derivative `dy/dx`,
         where series `x` is specified by values from column `x_col_name`,
         and series `y` is specified by values from column `y_col_name`.
@@ -136,8 +148,9 @@ class Preprocessing:
                 f"directory \"{load_from}\" doesn't exist"
 
         src_dir = self.data_dir if load_from is None else load_from
+        filenames = os.listdir(src_dir) if use_files is None else use_files
 
-        for filename in sorted(os.listdir(src_dir)):
+        for filename in sorted(filenames):
             df = pd.read_csv(f"{src_dir}/{filename}", sep=sep)
             derivatives = deriv_computer.compute(
                 x=df[x_col_name],
@@ -156,6 +169,7 @@ class Preprocessing:
             group_columns: str | tuple[str],
             target_columns: str | tuple[str],
             save_to: str,
+            use_files: tuple[str] | None = None,
             load_from: str | None = None,
             sep: str = ","
             ):
@@ -172,6 +186,9 @@ class Preprocessing:
                 to values from which the previous gropued values are matched
             save_to (str): directory to save `numpy.npz` archive
                 with grouped values
+            use_files (tuple[str] | None, optional): specify files to use
+                for grouping samples in. If `None`, all files from source
+                directory will be used. Default is `None`
             load_from (str | None, optional): if `load_from` is `None`,
                 the files from directory with raw data will be used.
                 If `load_data` is specified, it denotes a directory
@@ -185,7 +202,9 @@ class Preprocessing:
         To do so you can call `group_by()` method with `seq_len` = `n`,
         `group_columns` = `('a', 'b')`, `target_columns` = `('c', 'd')`.
         The desired matching will be stored in the `save_to` directory in
-        `numpy.npz` format
+        `numpy.npz` format. The method goes through each file in the source
+        directory (if `use_files` is `None`), or through each file in
+        `use_files` (if the latter is specified)
         """
         assert os.path.exists(save_to), \
             f"Unable to group data: " \
@@ -197,13 +216,14 @@ class Preprocessing:
                 f"directory \"{load_from}\" doesn't exist"
 
         src_dir = self.data_dir if load_from is None else load_from
+        filenames = os.listdir(src_dir) if use_files is None else use_files
 
         groups_list = ((group_columns,)
                        if isinstance(group_columns, str) else group_columns)
         targets_list = ((target_columns,)
                         if isinstance(target_columns, str) else target_columns)
 
-        for filename in sorted(os.listdir(src_dir)):
+        for filename in sorted(filenames):
             df = pd.read_csv(f"{src_dir}/{filename}", sep=sep)
 
             target_data = {

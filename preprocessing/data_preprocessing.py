@@ -3,6 +3,8 @@
 import os
 import pandas as pd
 import numpy as np
+import torch
+from sklearn import model_selection
 from OADlib.preprocessing.smoothing.base_smoother import BaseSmoother
 from OADlib.preprocessing.derivative_computation.\
     base_derivative_computer import BaseDerivativeComputer
@@ -125,7 +127,7 @@ class Preprocessing:
                 to take files from to compute derivatives. Default is `None`
             sep (str, optional): column separator in input data.
                 Default is `","`
-        
+
         The method goes through each file in the source directory
         (if `use_files` is `None`), or through each file in `use_files`
         (if the latter is specified)
@@ -196,9 +198,10 @@ class Preprocessing:
             sep (str, optional): column separator in input data.
                 Default is `","`
 
-        Imagine you have a dataframe with columns named `a`, `b`, `c` and `d`;
+        Imagine you have a data frame with columns named `a`, `b`, `c` and `d`;
         and you want to group values from columns `a`, `b` so that slices
-        `a[i - n:i]`, `b[i - n:i]` must match values `c[i - 1]` and `d[i - 1]`.
+        `a[i - n:i]`, `b[i - n:i]` must match single values
+        `c[i - 1]` and `d[i - 1]`.
         To do so you can call `group_by()` method with `seq_len` = `n`,
         `group_columns` = `('a', 'b')`, `target_columns` = `('c', 'd')`.
         The desired matching will be stored in the `save_to` directory in
@@ -238,3 +241,93 @@ class Preprocessing:
 
             fn, _ = os.path.splitext(filename)
             np.savez(f"{save_to}/{fn}.npz", **(target_data | grouped_data))
+
+    def train_valid_test_split(
+            self,
+            load_from: str | None = None,
+            use_files: tuple[str] | None = None,
+            *,
+            train_size: float,
+            valid_size: float,
+            test_size: float,
+            save_to: str,
+            random_state: int = 42
+            ):
+        """ Performs splitting the data from `arrays`
+        into training/validation/testing sets in the given proportions
+
+        Args:
+            load_from (str | None, optional): if `load_from` is `None`,
+                the files from directory with raw data will be used.
+                If `load_data` is specified, it denotes a directory
+                to take files from to split data. Default is `None`.
+                Note that the files from source directory are expected
+                to have `*.npz` extension
+            use_files (tuple[str] | None, optional): specify files to use
+                for splitting. If `None`, all files from source
+                directory will be used. Default is `None`. Note that
+                files are expected to have `*.npz` extension
+            train_size (float): training set part, must be in `(0, 1)`
+            valid_size (float): validation set part, must be in `(0, 1)`
+            test_size (float): testing set part, must be in `(0, 1)`
+            save_to (str): directory to save splitted data into
+            random_state (int, optional): random state for `sklearn`'s
+                `train_test_split()` function. Default is `42`
+
+        If `load_from` is `None`, source directory is directory with raw
+        data, otherwise source directory is `load_from`.
+        The method splits each `numpy.npz` array (if `use_files`
+        is `None`), or files from `use_files` list (if `use_files` is
+        specified) in the source directory in the given proportions.
+        stores splitted `*.pth` data in the `save_to` directory in form of a
+        dictionary with keys `"train"`, `"valid"`, `"test"`. Note that
+        the next equation must be satisfied:
+        `train_size + valid_size + test_size == 1.0`
+        """
+        assert os.path.exists(save_to), \
+            f"Unable to group data: " \
+            f"directory \"{save_to}\" doesn't exist"
+
+        if load_from is not None:
+            assert os.path.exists(load_from), \
+                f"Unable to group data: " \
+                f"directory \"{load_from}\" doesn't exist"
+
+        for size in (train_size, valid_size, test_size):
+            assert not np.isclose(size, 1.0), "All sizes must be < 1.0"
+            assert not np.isclose(size, 0.0), "All sizes must be > 0.0"
+
+        assert np.isclose(train_size + valid_size + test_size, 1.0), \
+            "train_size + valid_size + test_size == 1.0 isn't satisfied with "\
+            f"train_size = {train_size}, valid_size = {valid_size}, " \
+            f"test_size = {test_size}"
+
+        src_dir = self.data_dir if load_from is None else load_from
+        filenames = os.listdir(src_dir) if use_files is None else use_files
+
+        for filename in sorted(filenames):
+            fn, ext = os.path.splitext(filename)
+            assert ext == ".npz", "Only *.npz arrays are supported"
+
+            dataset: dict[str, dict[str, torch.Tensor]] = {
+                "train": {}, "valid": {}, "test": {}
+            }
+
+            archive = np.load(f"{src_dir}/{filename}")  # loading *.npz archive
+            for key in archive.keys():
+                train, valid_and_test = model_selection.train_test_split(
+                    archive[key],
+                    train_size=train_size,
+                    random_state=random_state
+                )
+                valid, test = model_selection.train_test_split(
+                    valid_and_test,
+                    test_size=test_size / (test_size + valid_size),
+                    random_state=random_state
+                )
+
+                dataset['train'][key] = train
+                dataset['valid'][key] = valid
+                dataset['test'][key] = test
+
+            torch.save(dataset, f"{save_to}/{fn}.pth")

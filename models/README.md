@@ -1,7 +1,7 @@
 ```text
 The structure if the LSTM-based models module.
 .
-└── __init__.py
+├── __init__.py
 ├── README.md
 ├── lstm_linear_regression.py     \\ The implementation of a LSTMLinearRegression class
 ├── lstm_fully_connected.py       \\ The implementation of a LSTMFullyConnected class

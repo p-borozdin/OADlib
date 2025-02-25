@@ -1,5 +1,5 @@
 ```text
-The structure if the LSTM-based models module.
+The structure if the LSTM-based models module:
 .
 ├── __init__.py
 ├── README.md

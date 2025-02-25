@@ -1,5 +1,5 @@
 ```text
-The structure of the module with implementations of the LSTM block and several head blocks.
+The structure of the module with implementations of the LSTM block and several head blocks:
 .
 ├── __init__.py
 ├── README.md

@@ -5,13 +5,13 @@ The structure of the OADlib modules:
 
 The structure if the data module:
 .
-└── data/
+├── data/
   ├── raw/  \\ Raw experimental data
 
 
 The structure if the OAD dataset module:
 .
-└── dataset/
+├── dataset/
   ├── __init__.py
   ├── README.md
   └── oad_dataset.py  \\ The implementation of a OAD dataset class
@@ -19,7 +19,7 @@ The structure if the OAD dataset module:
 
 The structure if the logging module:
 .
-└── logging/
+├── logging/
   ├── __init__.py
   ├── README.md
   └── logger_manager.py  \\ The implementation of a logger manager class
@@ -27,7 +27,7 @@ The structure if the logging module:
 
 The structure if the LSTM-based models module:
 .
-└── models/
+├── models/
   ├── __init__.py
   ├── README.md
   ├── lstm_linear_regression.py   \\ The implementation of a LSTM + Linear Regression model

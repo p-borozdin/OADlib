@@ -1,7 +1,11 @@
-**OADlib** library provides the implementations of some LSTM-based deep learning models that can be helpful in regression tasks dealing with time series processing.
-Each model consists of two blocks: **lstm** block and **head** block. The models differ in their head blocks, when the lstm block is kept the same for all the implemented models.
-
-The implementations of the models can be found in `OADlib/models` directory. For now the next LSTM-based models are implemented:
-* LSTM with Linear Regression head
-* LSTM with Fully-Connected head
-* LSTM with Self-Attention head
+**OADlib** library is a set of tools that can be useful in reconstructing a gas cell's resonance frequency by the data of its temperature with the use of LSTM-based neural networks. The structure of the OADlib is the following:
+```text
+.
+├── __init__.py
+├── README.md        \\ The library documentation
+├── data/            \\ The directory with raw and preprocessed data
+├── dataset/         \\ The directory with an implementation of a OAD dataset class
+├── logging/         \\ The directory with an implementation of a logger manager class
+├── models/          \\ The directory with implementations of LSTM-based neural network models
+└── preprocessing/   \\ The directory with an implementation of a data preprocessing class
+```

@@ -7,7 +7,8 @@ from OADlib.preprocessing.derivative_computation.\
 
 
 class PolyfitDerivative(BaseDerivativeComputer):
-    """ Polynominal fitting derivative computation algorithm\n
+    """ Polynominal fitting derivative computation algorithm.
+    Note that the "left" derivative is computed.\n
     The class inherits from BaseDerivativeComputer class
     """
     def __init__(

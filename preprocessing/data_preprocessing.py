@@ -240,7 +240,7 @@ class Preprocessing:
                 for name in groups_list}
 
             fn, _ = os.path.splitext(filename)
-            np.savez(f"{save_to}/{fn}.npz", **(target_data | grouped_data))
+            np.savez(f"{save_to}/{fn}_{seq_len}_points.npz", **(target_data | grouped_data))
 
     def train_valid_test_split(
             self,
@@ -253,7 +253,7 @@ class Preprocessing:
             save_to: str,
             random_state: int = 42
             ):
-        """ Performs splitting the data from `arrays`
+        """ Performs splitting the data from `*.npz` archive
         into training/validation/testing sets in the given proportions
 
         Args:

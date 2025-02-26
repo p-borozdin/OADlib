@@ -6,7 +6,8 @@ from OADlib.preprocessing.smoothing.base_smoother import BaseSmoother
 
 
 class SimpleMovingAverage(BaseSmoother):
-    """ Simple moving average (SMA) smoothing algorithms.\n
+    """ Simple moving average (SMA) smoothing algorithms.
+    Note that the averaging by "left" points is applied here.\n
     The class inherits from BaseSmoother class
     """
     def __init__(

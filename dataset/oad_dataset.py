@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 
 class OADDataset(Dataset):
     """ The OAD Dataset class.\n
-    The class iherits from `torch.utils.data.Dataset` class
+    The class inherits from `torch.utils.data.Dataset` class
     """
     def __init__(
             self,

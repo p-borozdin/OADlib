@@ -1,11 +1,10 @@
-The structure of the module with implementations of the LSTM block and several head blocks.
 ```text
+The structure of the module with implementations of the LSTM block and several head blocks:
 .
-└── src/
-  ├── __init__.py
-  ├── README.md                   \\ The module's documentation you are reading right now
-  ├── lstm_block.py               \\ The implementation of a LSTMBlock block
-  ├── linear_regression_head.py   \\ The implementation of a LinearRegressionHead block
-  ├── fully_connected_head.py     \\ The implementation of a FullyConnectedHead block
-  └── self_attention_head.py      \\ The implementation of a SelfAttentionHead block
+├── __init__.py
+├── README.md
+├── lstm_block.py               \\ The implementation of a LSTMBlock block
+├── linear_regression_head.py   \\ The implementation of a LinearRegressionHead block
+├── fully_connected_head.py     \\ The implementation of a FullyConnectedHead block
+└── self_attention_head.py      \\ The implementation of a SelfAttentionHead block
 ```

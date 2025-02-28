@@ -6,7 +6,14 @@ The structure of the OADlib modules:
 The structure if the data module:
 .
 ├── data/
-  ├── raw/  \\ Raw experimental data
+  ├── README.md
+  ├── preprocess.ipynb       \\ Notebook with the whole data preprocessing flow with examples
+  ├── raw/                   \\ Raw experimental data
+  ├── smoothed/              \\ Data with smoothed time series
+  ├── computed_derivatives/  \\ Data with computed derivatives
+  ├── normalized/            \\ Normalized data
+  ├── seq_grouped/           \\ Data grouped sequentially for sequence length from 1 to 10
+  └── datasets/              \\ Data split into train/valid/test sets for each sequence length
 
 
 The structure if the OAD dataset module:

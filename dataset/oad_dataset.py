@@ -13,7 +13,7 @@ class OADDataset(Dataset):
             self,
             *,
             path_to_file: str,
-            predictors: str | tuple[str],
+            predictors: str | list[str],
             target: str,
             mode: str,
             device: torch.device = torch.device('cpu')
@@ -58,10 +58,10 @@ class OADDataset(Dataset):
         """
         data = torch.load(self.path, map_location=self.device)
 
-        self.x_data = torch.stack(
+        self.x_data = torch.transpose(torch.stack(
             [torch.from_numpy(data[self.mode][name]) for name in self.x_names],
             axis=1
-            ).to(torch.float32)
+            ), -2, -1).to(torch.float32)
         self.y_data = (torch.from_numpy(data[self.mode][self.y_name])
                        .to(torch.float32))
 
@@ -81,6 +81,7 @@ class OADDataset(Dataset):
                 Must be in `[0, len(OADDataset) - 1]`
 
         Returns:
-            tuple: X and y at given index (tuple of `torch.Tensor`s)
+            tuple: `X` and `y` at given index (tuple of `torch.Tensor`s).
+                Note that the dimension of `X` is `(seq_len, in_features)`.
         """
         return self.x_data[index], self.y_data[index]

@@ -33,7 +33,7 @@ class Preprocessing:
             col_name: str,
             save_to: str,
             ext: str = "csv",
-            use_files: tuple[str] | None = None,
+            use_files: list[str] | None = None,
             load_from: str | None = None,
             sep: str = ","
             ):
@@ -101,7 +101,7 @@ class Preprocessing:
             deriv_col_name: str,
             save_to: str,
             ext: str = "csv",
-            use_files: tuple[str] | None = None,
+            use_files: list[str] | None = None,
             load_from: str | None = None,
             sep: str = ","
             ):
@@ -168,10 +168,10 @@ class Preprocessing:
             self,
             seq_len: int,
             *,
-            group_columns: str | tuple[str],
-            target_columns: str | tuple[str],
+            group_columns: str | list[str],
+            target_columns: str | list[str],
             save_to: str,
-            use_files: tuple[str] | None = None,
+            use_files: list[str] | None = None,
             load_from: str | None = None,
             sep: str = ","
             ):
@@ -239,13 +239,15 @@ class Preprocessing:
                                 for i in range(data_len)])
                 for name in groups_list}
 
-            fn, _ = os.path.splitext(filename)
-            np.savez(f"{save_to}/{fn}_{seq_len}_points.npz", **(target_data | grouped_data))
+            np.savez(
+                f"{save_to}/{seq_len}_points.npz",
+                **(target_data | grouped_data)
+                )
 
     def train_valid_test_split(
             self,
             load_from: str | None = None,
-            use_files: tuple[str] | None = None,
+            use_files: list[str] | None = None,
             *,
             train_size: float,
             valid_size: float,
@@ -330,4 +332,4 @@ class Preprocessing:
                 dataset['valid'][key] = valid
                 dataset['test'][key] = test
 
-            torch.save(dataset, f"{save_to}/{fn}.pth")
+            torch.save(dataset, f"{save_to}/dataset_{fn}.pth")

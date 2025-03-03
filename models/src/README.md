@@ -1,7 +1,6 @@
 ```text
-The structure of the module with implementations of the LSTM block and several head blocks:
+The structure of the directory with implementations of the LSTM block and several head blocks:
 .
-├── __init__.py
 ├── README.md
 ├── lstm_block.py               \\ The implementation of a LSTMBlock block
 ├── linear_regression_head.py   \\ The implementation of a LinearRegressionHead block

@@ -3,7 +3,7 @@
 The structure of the OADlib modules:
 
 
-The structure if the data module:
+The structure if the data directory:
 .
 ├── data/
   ├── README.md
@@ -14,6 +14,13 @@ The structure if the data module:
   ├── normalized/            \\ Normalized data
   ├── seq_grouped/           \\ Data grouped sequentially for sequence length from 1 to 10
   └── datasets/              \\ Data split into train/valid/test sets for each sequence length
+
+
+The structure of the optuna examples directory:
+.
+├── optuna_examples/
+  ├── README.md
+  └── tuning.py  \\ The example of hyperparameters tuning with optuna library for LSTMFullyConnected model
 
 
 The structure if the OAD dataset module:

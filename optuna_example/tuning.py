@@ -25,7 +25,7 @@ from OADlib.logging.logger_manager import LoggerManager
 from OADlib.dataset.oad_dataset import OADDataset
 from OADlib.models.lstm_fully_connected import LSTMFullyConnected
 
-# Specifying the visible GPU and torch.device
+# Specifying the visible GPU torch.device
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

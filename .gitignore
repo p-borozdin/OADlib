@@ -109,3 +109,5 @@ cython_debug/
 .DS_Store
 
 *.out
+*.log
+training/

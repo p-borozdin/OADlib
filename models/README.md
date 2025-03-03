@@ -7,7 +7,6 @@ The structure if the LSTM-based models module:
 ├── lstm_fully_connected.py       \\ The implementation of a LSTMFullyConnected class
 ├── lstm_self_attention.py        \\ The implementation of a LSTMSelfAttention class
 └── src/
-  ├── __init__.py
   ├── README.md
   ├── lstm_block.py               \\ The implementation of a LSTMBlock block
   ├── linear_regression_head.py   \\ The implementation of a LinearRegressionHead block

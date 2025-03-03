@@ -66,7 +66,7 @@ TRIALS = 400  # Total number of optuna trials
 PATIENCE = 20  # Patience for optuna's pruner
 
 # Specifying short model's name for serialization
-MODEL_SHORT_NAME = "LSTM_FC"
+MODEL_SHORT_NAME = "LSTM_FC"  # Stands for "LSTM Fully-Connected"
 
 # Fully-connected layers' activations to tune
 activations_matching = {

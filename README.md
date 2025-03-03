@@ -1,4 +1,9 @@
 **OADlib** library is a set of tools that can be useful in reconstructing a gas cell's resonance frequency by the data of its temperature with the use of LSTM-based neural networks.
+
+See `OADlib/data/` to find details on the data preprocessing flow.
+
+See `OADlib/optuna_example/` to find details on the hyperparameters optimization process.
+
 ```text
 The structure of the OADlib modules:
 

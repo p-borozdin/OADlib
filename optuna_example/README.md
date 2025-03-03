@@ -95,4 +95,11 @@ the next files/folders will be created in the execution directory (i.e. in the `
     ```
     The `model_name` contains information about the trial and epoch at which the model performed best, as well as the best metrics (i.e. MAE) that were demonstrated by the model at that particular point.
 
+To specify the device (CPU or GPU) for the process's execution, the next code is used:
+```python
+# Specifying the visible GPU torch.device
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+```
+
 The code from `OADlib/optuna_example/tuning.py` can be copied and modified in order to fit the requirements of your particular model, dataset or set of hyperparameters.

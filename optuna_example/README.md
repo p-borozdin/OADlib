@@ -103,3 +103,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ```
 
 The code from `OADlib/optuna_example/tuning.py` can be copied and modified in order to fit the requirements of your particular model, dataset or set of hyperparameters.
+
+You can monitor the training process in real time with the `tensorboard` utility. 
+For the given example of optuna code, running the command 
+
+`tensorboard --logdir=path/to/OADlib/optuna_example/training/models --host=localhost --port=50000`
+
+can show you the current training progress within optuna trials in your browser (you can specify any other port, not necessarily `--port=50000`).

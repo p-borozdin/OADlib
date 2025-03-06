@@ -1,0 +1,10 @@
+matplotlib
+numpy
+optuna
+pandas
+tensorboard
+torch
+torchinfo
+torchmetrics
+torchvision
+tqdm

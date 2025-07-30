@@ -56,7 +56,7 @@ class OADDataset(Dataset):
     def __load_data(self):
         """ Loading data from a `*.pth` file on the given `torch.device`
         """
-        data = torch.load(self.path, map_location=self.device)
+        data = torch.load(self.path, map_location=self.device, weights_only=False)
 
         self.x_data = torch.transpose(torch.stack(
             [torch.from_numpy(data[self.mode][name]) for name in self.x_names],
